@@ -75,9 +75,11 @@ class RenRen(object):
         data = urllib.urlencode({
                 'email': self.email,
                 'password': self.password,
-                'origURL': 'http://www.renren.com/home',
-                'domain': 'renren.com',
+                # 'origURL': 'http://www.renren.com/home',
+                # 'domain': 'renren.com',
             })
+        print self.email
+        print self.password
 
         self.cookie = cookielib.CookieJar()
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookie))
@@ -88,10 +90,11 @@ class RenRen(object):
         
         urllib2.install_opener(self.opener)
         request = urllib2.Request(url, data=data)
-        urllib2.urlopen(request)
+        self.opener.open(request)
         
         own_uid_pattern = re.compile('renren\.com/(\d+)/profile')
-        profile_page = self.opener.open('http://www.renren.com/profile.do')
+        request2 = urllib2.Request("http://www.renren.com/profile.do")
+        profile_page = self.opener.open(request2)
         own_uid = own_uid_pattern.findall(profile_page.geturl())
         if not own_uid:
             if self.login_times >= 3:
@@ -105,14 +108,14 @@ class RenRen(object):
 
     def view_page(self, uid):
         url = 'http://www.renren.com/{0}/profile'.format(uid)
-        self.opener.open(url)
+        self.opener.open(urllib2.Request(url) )
 
 
     def get_friends(self, uid=None):
         uid = uid or self.uid
         
         URL = 'http://friend.renren.com/GetFriendList.do?curpage={0}&id=' + str(uid)
-        first_page = self.opener.open(URL.format(0))
+        first_page = self.opener.open(urllib2.Request(URL.format(0)) )
 
         parse = etree.HTMLParser()
         tree = etree.parse(first_page, parse)
@@ -135,7 +138,7 @@ class RenRen(object):
         @retry()
         @gtimeout()
         def _get(p):
-            html = self.opener.open(URL.format(p))
+            html = self.opener.open(urllib2.Request(URL.format(p)) )
             tree = etree.parse(html, parse)
             res = [f.split('=')[1] for f in tree.xpath(friends_xpath)]
             return res
@@ -210,6 +213,5 @@ class RenRenRelationShip(object):
         print 'collect done'
         slot.pop(0)
         return slot
-
 
 

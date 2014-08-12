@@ -7,6 +7,7 @@ import gevent
 
 
 class TooLong(Exception):
+    print 'Exception Too Long'
     pass
 
 

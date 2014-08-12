@@ -20,6 +20,7 @@ def _dump(data):
 def _load():
     try:
         with open(RENREN_FILE, 'r') as f:
+            print 'open file complete'
             return pickle.load(f)
     except IOError:
         from utils import get_accounts
