@@ -75,11 +75,9 @@ class RenRen(object):
         data = urllib.urlencode({
                 'email': self.email,
                 'password': self.password,
-                # 'origURL': 'http://www.renren.com/home',
-                # 'domain': 'renren.com',
+                'origURL': 'http://www.renren.com/home',
+                'domain': 'renren.com',
             })
-        print self.email
-        print self.password
 
         self.cookie = cookielib.CookieJar()
         self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookie))
@@ -96,6 +94,7 @@ class RenRen(object):
         request2 = urllib2.Request("http://www.renren.com/profile.do")
         profile_page = self.opener.open(request2)
         own_uid = own_uid_pattern.findall(profile_page.geturl())
+        print own_uid
         if not own_uid:
             if self.login_times >= 3:
                 raise Exception("Login Failure!")
@@ -120,7 +119,7 @@ class RenRen(object):
         parse = etree.HTMLParser()
         tree = etree.parse(first_page, parse)
         friends_amount = int(tree.xpath('//div[@id="toc"]/p[1]/span/text()')[0])
-
+        print friends_amount
 
         friends_pages, _rest = divmod(friends_amount, 20)
         if _rest > 0:
@@ -132,6 +131,7 @@ class RenRen(object):
 
 
         first_page_friends = [f.split('=')[1] for f in tree.xpath(friends_xpath)]
+        # print first_page_friends
         all_friends.extend(first_page_friends)
 
 
@@ -146,11 +146,12 @@ class RenRen(object):
         #this is sync version
         for i in range(1, friends_pages):
             all_friends.extend(_get(i))
+        print len(all_friends)    
 
 
         # 多次测试发现，对同一个人的好友不能并发请求，
         # 如果并发，这些请求全部会block住，没有响应。
-        # 所以是对不同的人起多个并发请求
+        # 所以是对不同的人发起多个并发请求
 
         ## this is gevent version
         #pool = Pool(2)

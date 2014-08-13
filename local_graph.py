@@ -15,6 +15,7 @@ RENREN_FILE = 'renren_data'
 def _dump(data):
     with open(RENREN_FILE, 'w') as f:
         pickle.dump(data, f, 2)
+        f.close()
         
         
 def _load():
