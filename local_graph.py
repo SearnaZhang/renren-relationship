@@ -8,19 +8,19 @@ import subprocess
 import networkx as nx
 
 from renren import FriendsStore, RenRenRelationShip
-
+import renren
 
 RENREN_FILE = 'renren_data'
 
 def _dump(data):
-    with open(RENREN_FILE, 'w') as f:
+    with open(RENREN_FILE, 'wb') as f:
         pickle.dump(data, f, 2)
         f.close()
         
         
 def _load():
     try:
-        with open(RENREN_FILE, 'r') as f:
+        with open(RENREN_FILE, 'rb') as f:
             print 'open file complete'
             return pickle.load(f)
     except IOError:
@@ -200,6 +200,7 @@ class DrawGraphviz(GraphAnalysis):
 
 if __name__ == '__main__':
     data = _load()
+    print 'load complete'
     g = DrawGraphviz()
     g.import_data(data)
     g.save()
